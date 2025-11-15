@@ -1,0 +1,70 @@
+# Amazon Lex Bot Configuration
+# Bot Name: PhotoSearchBot
+# Intent: SearchIntent
+
+# Sample Utterances for SearchIntent
+# These utterances train the bot to recognize various search patterns
+
+# Single keyword searches
+trees
+birds
+dogs
+cats
+people
+cars
+mountains
+beach
+sunset
+flowers
+
+# Show me pattern
+show me trees
+show me birds
+show me dogs
+show me cats
+show me people
+show me cars
+show me photos with trees
+show me photos with birds
+show me photos of dogs
+show me pictures of cats
+
+# Find pattern
+find trees
+find birds
+find dogs
+find cats
+find people
+find photos with trees
+find photos of dogs
+find pictures of cats
+
+# Two keyword searches
+dogs and cats
+trees and mountains
+people and cars
+beach and sunset
+flowers and trees
+show me dogs and cats
+show me trees and birds
+show me people and cars
+find dogs and cats
+find trees and mountains
+photos with dogs and cats
+photos with trees and mountains
+pictures of dogs and cats
+pictures with trees and birds
+
+# Natural language patterns
+show me photos with trees and birds in them
+show me pictures of dogs and cats together
+find photos with people and cars
+find pictures of mountains and trees
+I want to see dogs
+I want to see photos of cats
+I want photos with trees
+can you show me dogs
+can you find cats
+looking for trees
+searching for birds
+

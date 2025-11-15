@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Photo Album</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Smart Photo Album</h1>
+            <p class="subtitle">Search your photos using natural language</p>
+        </header>
+
+        <main>
+            <!-- Search Section -->
+            <section class="search-section">
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search for photos (e.g., 'show me dogs and cats')" 
+                        autocomplete="off"
+                    >
+                    <button id="searchBtn" class="btn btn-primary">Search</button>
+                </div>
+                <div id="searchResults" class="results-container"></div>
+            </section>
+
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <h2>Upload New Photo</h2>
+                <div class="upload-box">
+                    <div class="file-input-wrapper">
+                        <input 
+                            type="file" 
+                            id="photoInput" 
+                            accept="image/*"
+                            class="file-input"
+                        >
+                        <label for="photoInput" class="file-label">
+                            <span id="fileName">Choose a photo</span>
+                        </label>
+                    </div>
+                    
+                    <div class="custom-labels-input">
+                        <input 
+                            type="text" 
+                            id="customLabels" 
+                            placeholder="Custom labels (comma-separated, e.g., 'Sam, Sally')"
+                            autocomplete="off"
+                        >
+                    </div>
+                    
+                    <button id="uploadBtn" class="btn btn-secondary">Upload Photo</button>
+                </div>
+                <div id="uploadStatus" class="status-message"></div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Cloud Computing Assignment 3 - Fall 2025</p>
+        </footer>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+
