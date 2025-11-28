@@ -13,9 +13,10 @@ rekognition = boto3.client('rekognition')
 s3 = boto3.client('s3')
 
 # OpenSearch configuration
-OPENSEARCH_HOST = 'your-opensearch-domain-endpoint'
+OPENSEARCH_HOST = 'search-photos-ts2i64orwoedpcgg26fppjkprm.us-east-1.es.amazonaws.com'
 OPENSEARCH_REGION = 'us-east-1'
 OPENSEARCH_INDEX = 'photos'
+
 
 def get_opensearch_client():
     """
@@ -29,7 +30,7 @@ def get_opensearch_client():
         'es',
         session_token=credentials.token
     )
-    
+
     client = OpenSearch(
         hosts=[{'host': OPENSEARCH_HOST, 'port': 443}],
         http_auth=awsauth,
@@ -37,8 +38,9 @@ def get_opensearch_client():
         verify_certs=True,
         connection_class=RequestsHttpConnection
     )
-    
+
     return client
+
 
 def detect_labels_from_image(bucket, key):
     """
@@ -56,37 +58,37 @@ def detect_labels_from_image(bucket, key):
             MaxLabels=12,
             MinConfidence=70
         )
-        
+
         labels = [label['Name'].lower() for label in response['Labels']]
         logger.info(f"Detected labels: {labels}")
         return labels
-        
+
     except Exception as e:
         logger.error(f"Error detecting labels: {str(e)}")
         raise
 
+
 def get_custom_labels(bucket, key):
-    """
-    Retrieve custom labels from S3 object metadata
-    Returns a list of custom label strings
-    """
     try:
         response = s3.head_object(Bucket=bucket, Key=key)
         metadata = response.get('Metadata', {})
-        
+
         custom_labels_str = metadata.get('customlabels', '')
-        
+
         if custom_labels_str:
-            # Parse comma-separated custom labels
-            custom_labels = [label.strip().lower() for label in custom_labels_str.split(',') if label.strip()]
-            logger.info(f"Custom labels found: {custom_labels}")
+            # Remove any surrounding quotes
+            custom_labels = [label.strip().strip('"').lower()
+                             for label in custom_labels_str.split(',')
+                             if label.strip()]
+
             return custom_labels
-        
+
         return []
-        
+
     except Exception as e:
         logger.error(f"Error retrieving custom labels: {str(e)}")
         return []
+
 
 def index_photo_to_opensearch(photo_data):
     """
@@ -94,19 +96,20 @@ def index_photo_to_opensearch(photo_data):
     """
     try:
         client = get_opensearch_client()
-        
+
         response = client.index(
             index=OPENSEARCH_INDEX,
             body=photo_data,
             refresh=True
         )
-        
+
         logger.info(f"Successfully indexed photo: {photo_data['objectKey']}")
         return response
-        
+
     except Exception as e:
         logger.error(f"Error indexing to OpenSearch: {str(e)}")
         raise
+
 
 def lambda_handler(event, context):
     """
@@ -114,28 +117,28 @@ def lambda_handler(event, context):
     Triggered by S3 PUT events
     """
     logger.info(f"Received event: {json.dumps(event)}")
-    
+
     try:
         # Parse S3 event
         for record in event['Records']:
             bucket = record['s3']['bucket']['name']
             key = unquote_plus(record['s3']['object']['key'])
-            
+
             logger.info(f"Processing file: {key} from bucket: {bucket}")
-            
+
             # Get timestamp from event or use current time
             timestamp = record['eventTime']
             created_timestamp = datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%fZ').isoformat()
-            
+
             # Detect labels using Rekognition
             rekognition_labels = detect_labels_from_image(bucket, key)
-            
+
             # Get custom labels from S3 metadata
             custom_labels = get_custom_labels(bucket, key)
-            
+
             # Combine all labels
             all_labels = list(set(rekognition_labels + custom_labels))
-            
+
             # Build the JSON object for OpenSearch
             photo_document = {
                 'objectKey': key,
@@ -143,19 +146,19 @@ def lambda_handler(event, context):
                 'createdTimestamp': created_timestamp,
                 'labels': all_labels
             }
-            
+
             logger.info(f"Photo document: {json.dumps(photo_document)}")
-            
+
             # Index the photo document
             index_photo_to_opensearch(photo_document)
-        
+
         return {
             'statusCode': 200,
             'body': json.dumps({
                 'message': 'Photo indexed successfully'
             })
         }
-        
+
     except Exception as e:
         logger.error(f"Error processing event: {str(e)}")
         return {

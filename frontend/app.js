@@ -47,7 +47,7 @@ async function handleSearch() {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Api-Key': API_CONFIG.API_KEY
+                    'x-api-key': API_CONFIG.API_KEY
                 }
             }
         );
@@ -156,7 +156,7 @@ async function handleUpload() {
         // Prepare headers
         const headers = {
             'Content-Type': file.type,
-            'X-Api-Key': API_CONFIG.API_KEY
+            'x-api-key': API_CONFIG.API_KEY
         };
         
         if (customLabelsValue) {
@@ -164,7 +164,7 @@ async function handleUpload() {
         }
         
         // Upload to S3 via API Gateway
-        const uploadUrl = `${API_ENDPOINTS.UPLOAD}/${objectKey}`;
+        const uploadUrl = `${API_CONFIG.BASE_URL}/photos/${objectKey}`;
         
         const response = await fetch(uploadUrl, {
             method: 'PUT',
