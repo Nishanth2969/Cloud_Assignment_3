@@ -22,11 +22,21 @@ const SearchSection = () => {
     setLoading(true);
     setError('');
     setHasSearched(true);
+    setResults([]); // Clear previous results first
 
     try {
       const data = await searchPhotos(query);
-      setResults(data.results || []);
+      console.log('Search results:', data);
+      
+      // Ensure results is an array and deduplicate
+      const resultsArray = Array.isArray(data.results) ? data.results : [];
+      const uniqueResults = Array.from(
+        new Map(resultsArray.map(item => [item.url, item])).values()
+      );
+      
+      setResults(uniqueResults);
     } catch (err) {
+      console.error('Search error:', err);
       setError(err.message);
       setResults([]);
     } finally {
